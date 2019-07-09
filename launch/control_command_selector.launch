@@ -2,9 +2,11 @@
 <launch>
     <arg name="control_command_topic" default="control_command"/>
     <arg name="manual_command_topic" default="manual_command"/>
+    <arg name="current_command_topic" default="current_command"/>
 
     <node pkg="control_command_selector" type="control_command_selector_node" name="control_command_selector_node" output="screen" respawn="false" respawn_delay="0">
         <param name="control_command_topic" value="$(arg control_command_topic)"/>
         <param name="manual_command_topic" value="$(arg manual_command_topic)"/>
+        <param name="current_command_topic" value="$(arg current_command_topic)"/>
     </node>
 </launch>
