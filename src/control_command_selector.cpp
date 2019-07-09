@@ -40,6 +40,9 @@ void ControlCommandSelector::controllerComandCallback(const usv_control_msgs::Az
 
 boost::optional<rostate_machine::Event> ControlCommandSelector::publishZeroCommandAsCurrentCommand()
 {
+    usv_control_msgs::AzimuthThrusterCatamaranDriveStamped msg;
+    msg.header.stamp = ros::Time::now();
+    current_command_pub_.publish(msg);
     return boost::none;
 }
 
@@ -47,17 +50,28 @@ boost::optional<rostate_machine::Event> ControlCommandSelector::publishControlCo
 {
     if(control_command_)
     {
-
+        current_command_pub_.publish(*control_command_);
     }
     else
     {
         usv_control_msgs::AzimuthThrusterCatamaranDriveStamped msg;
-
+        msg.header.stamp = ros::Time::now();
+        current_command_pub_.publish(msg);
     }
     return boost::none;
 }
 
 boost::optional<rostate_machine::Event> ControlCommandSelector::publishManualCommandAsCurrentCommand()
 {
+    if(manual_command_)
+    {
+        current_command_pub_.publish(*manual_command_);
+    }
+    else
+    {
+        usv_control_msgs::AzimuthThrusterCatamaranDriveStamped msg;
+        msg.header.stamp = ros::Time::now();
+        current_command_pub_.publish(msg);
+    }
     return boost::none;
 }
