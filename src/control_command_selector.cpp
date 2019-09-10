@@ -7,15 +7,15 @@ ControlCommandSelector::ControlCommandSelector(ros::NodeHandle nh,ros::NodeHandl
     pnh_ = pnh;
     pnh_.param<std::string>("manual_command_topic", manual_command_topic_, "/manual_command");
     pnh_.param<std::string>("control_command_topic", control_command_topic_, "/control_command");
-    pnh_.param<std::string>("current_command_topic", current_command_topic_, "/current_command");
+    pnh_.param<std::string>("motor_command_topic", motor_command_topic_, "/motor_command");
     
-    current_command_pub_ = nh_.advertise<usv_control_msgs::AzimuthThrusterCatamaranDriveStamped>(current_command_topic_,1);
-    event_client_.registerCallback(std::bind(&ControlCommandSelector::publishZeroCommandAsCurrentCommand, this),
-        "ControlCommandSelector::publishZeroCommandAsCurrentCommand");
-    event_client_.registerCallback(std::bind(&ControlCommandSelector::publishControlCommandAsCurrentCommand, this),
-        "ControlCommandSelector::publishControlCommandAsCurrentCommand");
-    event_client_.registerCallback(std::bind(&ControlCommandSelector::publishManualCommandAsCurrentCommand, this),
-        "ControlCommandSelector::publishManualCommandAsCurrentCommand");
+    motor_command_pub_ = nh_.advertise<usv_control_msgs::AzimuthThrusterCatamaranDriveStamped>(motor_command_topic_,1);
+    event_client_.registerCallback(std::bind(&ControlCommandSelector::publishZeroCommandAsMotorCommand, this),
+        "ControlCommandSelector::publishZeroCommandAsMotorCommand");
+    event_client_.registerCallback(std::bind(&ControlCommandSelector::publishControlCommandAsMotorCommand, this),
+        "ControlCommandSelector::publishControlCommandAsMotorCommand");
+    event_client_.registerCallback(std::bind(&ControlCommandSelector::publishManualCommandAsMotorCommand, this),
+        "ControlCommandSelector::publishManualCommandAsMotorCommand");
     event_client_.run();
     manual_command_sub_ = nh_.subscribe(manual_command_topic_,1,&ControlCommandSelector::manualComandCallback,this);
     control_command_sub_ = nh_.subscribe(control_command_topic_,1,&ControlCommandSelector::controllerComandCallback,this);
@@ -38,40 +38,40 @@ void ControlCommandSelector::controllerComandCallback(const usv_control_msgs::Az
     return;
 }
 
-boost::optional<rostate_machine::Event> ControlCommandSelector::publishZeroCommandAsCurrentCommand()
+boost::optional<rostate_machine::Event> ControlCommandSelector::publishZeroCommandAsMotorCommand()
 {
     usv_control_msgs::AzimuthThrusterCatamaranDriveStamped msg;
     msg.header.stamp = ros::Time::now();
-    current_command_pub_.publish(msg);
+    motor_command_pub_.publish(msg);
     return boost::none;
 }
 
-boost::optional<rostate_machine::Event> ControlCommandSelector::publishControlCommandAsCurrentCommand()
+boost::optional<rostate_machine::Event> ControlCommandSelector::publishControlCommandAsMotorCommand()
 {
     if(control_command_)
     {
-        current_command_pub_.publish(*control_command_);
+        motor_command_pub_.publish(*control_command_);
     }
     else
     {
         usv_control_msgs::AzimuthThrusterCatamaranDriveStamped msg;
         msg.header.stamp = ros::Time::now();
-        current_command_pub_.publish(msg);
+        motor_command_pub_.publish(msg);
     }
     return boost::none;
 }
 
-boost::optional<rostate_machine::Event> ControlCommandSelector::publishManualCommandAsCurrentCommand()
+boost::optional<rostate_machine::Event> ControlCommandSelector::publishManualCommandAsMotorCommand()
 {
     if(manual_command_)
     {
-        current_command_pub_.publish(*manual_command_);
+        motor_command_pub_.publish(*manual_command_);
     }
     else
     {
         usv_control_msgs::AzimuthThrusterCatamaranDriveStamped msg;
         msg.header.stamp = ros::Time::now();
-        current_command_pub_.publish(msg);
+        motor_command_pub_.publish(msg);
     }
     return boost::none;
 }
