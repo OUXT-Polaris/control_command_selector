@@ -5,6 +5,7 @@
 #include <ros/ros.h>
 #include <usv_control_msgs/AzimuthThrusterCatamaranDriveStamped.h>
 #include <rostate_machine/event_client.h>
+#include <std_msgs/Empty.h>
 
 // Headers in Boost
 #include <boost/optional.hpp>
@@ -26,6 +27,7 @@ private:
     ros::Subscriber manual_command_sub_;
     ros::Subscriber control_command_sub_;
     ros::Publisher motor_command_pub_;
+    ros::Publisher reset_command_pub_;
     boost::optional<usv_control_msgs::AzimuthThrusterCatamaranDriveStamped> manual_command_;
     boost::optional<usv_control_msgs::AzimuthThrusterCatamaranDriveStamped> control_command_;
     rostate_machine::EventClient event_client_;
